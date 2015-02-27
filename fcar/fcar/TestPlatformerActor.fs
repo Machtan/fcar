@@ -1,4 +1,5 @@
-﻿module TestPlatformerActors
+﻿//https://bruinbrown.wordpress.com/2013/10/06/making-a-platformer-in-f-with-monogame/
+module TestPlatformerActor
 
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
@@ -28,9 +29,10 @@ type WorldActor =
         with get () = Rectangle((int this.Position.X),(int this.Position.Y),(int this.Size.X),(int this.Size.Y))
  
     member this.DesiredBounds
-        with get () = match this.BodyType with //let desiredPos = (? fjernet fra mellem "=" og "mattch")
-                        | Dynamic(s) -> this.Position + s
-                        | _          -> this.Position
+        with get () = let desiredPos = match this.BodyType with
+                                       | Dynamic(s) -> this.Position + s
+                                       | _-> this.Position
+                      Rectangle((int desiredPos.X), (int desiredPos.Y), (int this.Size.X), (int this.Size.Y))
 
 let CreateActor (content:ContentManager) (textureName, actorType, position, size, isStatic) =
     let tex = if not (System.String.IsNullOrEmpty textureName) then
