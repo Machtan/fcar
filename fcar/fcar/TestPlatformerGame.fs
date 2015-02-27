@@ -11,7 +11,7 @@ open TestPlatformerInput
 type Game1 () as x =
     inherit Game()
  
-    do x.Content.RootDirectory <- "Content"
+    do x.Content.RootDirectory <- "assets"
     let graphics = new GraphicsDeviceManager(x)
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
  
