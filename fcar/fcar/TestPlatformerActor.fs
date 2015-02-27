@@ -31,17 +31,15 @@ type WorldActor =
     member this.DesiredBounds
         with get () = let desiredPos = match this.BodyType with
                                        | Dynamic(s) -> this.Position + s
-                                       | _-> this.Position
+                                       | _          -> this.Position
                       Rectangle((int desiredPos.X), (int desiredPos.Y), (int this.Size.X), (int this.Size.Y))
 
 let CreateActor (content:ContentManager) (textureName, actorType, position, size, isStatic) =
-    let tex = if not (System.String.IsNullOrEmpty textureName) then
-                  Some(content.Load textureName)
-              else
-                  None
-    let bt = if isStatic then
-                Static
-             else
-                Dynamic(Vector2(0.f,0.f))
+    let tex = if not (System.String.IsNullOrEmpty textureName) 
+                then Some(content.Load textureName)
+                else None
+    let bt = if isStatic 
+                then Static
+                else Dynamic(Vector2(0.f,0.f))
     { ActorType = actorType; Position = position; Size = size; Texture = tex; BodyType = bt; }
 

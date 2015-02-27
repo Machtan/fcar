@@ -24,8 +24,8 @@ type Game1 () as x =
                                     |> List.map CreateActor')
 
     let DrawActor (sb:SpriteBatch) actor =
-        if actor.Texture.IsSome then
-            do sb.Draw(actor.Texture.Value, actor.Position, Color.White)
+        if actor.Texture.IsSome 
+            then do sb.Draw(actor.Texture.Value, actor.Position, Color.White)
         ()
 
     override x.Initialize() =

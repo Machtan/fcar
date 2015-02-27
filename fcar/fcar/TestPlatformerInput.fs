@@ -10,16 +10,16 @@ let HandleInput (kbState:KeyboardState) actor =
         match keys with
         | [] -> currentVelocity
         | x :: xs -> match x with
-                     | Keys.Left -> let newSpeed = if (currentVelocity.X - 0.1f) < -1.f then
-                                                       -1.f
-                                                   else
-                                                       currentVelocity.X - 0.1f
+                     | Keys.Left -> let newSpeed = 
+                                        if (currentVelocity.X - 0.1f) < -1.f 
+                                            then -1.f
+                                            else currentVelocity.X - 0.1f
                                     let newV = Vector2(newSpeed, currentVelocity.Y)
                                     HandleKeys xs (newV,state)
-                     | Keys.Right -> let newSpeed = if (currentVelocity.X + 0.1f) > 1.f then
-                                                       1.f
-                                                    else
-                                                       currentVelocity.X + 0.1f
+                     | Keys.Right -> let newSpeed = 
+                                        if (currentVelocity.X + 0.1f) > 1.f 
+                                            then 1.f
+                                            else currentVelocity.X + 0.1f
                                      let newV = Vector2(newSpeed, currentVelocity.Y)
                                      HandleKeys xs (newV,state)
                      | Keys.Space -> match state with
