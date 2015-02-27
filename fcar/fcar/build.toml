@@ -1,0 +1,14 @@
+name = "FCar"
+main = "Program.fs"
+assets = "assets"
+developer = "com.machtan"
+version = "1.0.0"
+icon = "icon.icns"
+authors = ["Jakob Lautrup Nysom", "Stinus Møhl Thomsen"]
+
+dependencies = [
+    "MonoMac",
+    "Lidgren.Network",
+    "Tao.Sdl",
+    "MonoGame.Framework"
+]
