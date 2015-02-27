@@ -1,4 +1,5 @@
 ﻿module TestPlatformerGame
+open TestPlatformerActors
  
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
@@ -10,12 +11,25 @@ type Game1 () as x =
     let graphics = new GraphicsDeviceManager(x)
     let mutable spriteBatch = Unchecked.defaultof<'T>
  
+    let CreateActor' = CreateActor x.Content
+ 
+    let WorldObjects = lazy ([("player.png", Player(Nothing), Vector2(10.f,28.f), Vector2(32.f,32.f), false);
+                                ("obstacle.png", Obstacle, Vector2(10.f,60.f), Vector2(32.f,32.f), true);
+                                ("", Obstacle, Vector2(42.f,60.f), Vector2(32.f,32.f), true);]
+                                |> List.map CreateActor')
+
+    let DrawActor (sb:SpriteBatch) actor =
+        if actor.Texture.IsSome then
+            do sb.Draw(actor.Texture.Value, actor.Position, Color.White)
+        ()
+
     override x.Initialize() =
         do spriteBatch         
         do base.Initialize()
         ()
  
     override x.LoadContent() =
+        do WorldObjects.Force () |> ignore
         ()
  
     override x.Update (gameTime) =

@@ -42,3 +42,4 @@ let CreateActor (content:ContentManager) (textureName, actorType, position, size
              else
                 Dynamic(Vector2(0.f,0.f))
     { ActorType = actorType; Position = position; Size = size; Texture = tex; BodyType = bt; }
+
