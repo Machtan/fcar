@@ -6,7 +6,7 @@ open CarActor
 type Collision = {
     actor: Actor;
     mov: Vector2;
-    dist: float;
+    dist: float32;
     target: Actor;
 }
 
@@ -20,13 +20,12 @@ let get_collision actor check =
             match bodies with
                 | (Circle(ar), Circle(cr)) ->
                     let dr = ar + cr
-                    let (dx, dy) = check.Pos - (actor.Pos + vel)
-                    let dist = System.Math.Sqrt (dx * dx + dy * dy)
+                    let d = check.Pos - (actor.Pos + vel)
+                    let dist = d.Length()
                     let diff = dist - dr
-                    if diff < 0
-                    then Some ({
-                        actor = actor;
-                        mov = vel + (vel.Normalize() * diff);
+                    if diff < 0.0f
+                    then Some ({ actor = actor;
+                        mov = vel + (Vector2.Normalize(vel) * diff);
                         dist = System.Math.Abs diff;
                         target = check;
                     })
@@ -42,30 +41,32 @@ let Move objects =
         match targets with
         | [] -> col
         | tar::rem ->
-            let c = match get_collision actor tar with
-            | Some(newc) ->
-                match col with
-                | Some(oldc) ->
-                    if newc.dist < oldc.dist
-                    then Some(newc)
-                    else Some(oldc)
-                | None -> Some(newc)
-            | None -> col
+            let c =
+                match get_collision actor tar with
+                | Some(newc) ->
+                    match col with
+                    | Some(oldc) ->
+                        if newc.dist < oldc.dist
+                        then Some(newc)
+                        else Some(oldc)
+                    | None -> Some(newc)
+                | None -> col
             checkcols actor rem c
 
-    let rec move_objs remaining fixed =
+    let rec move_objs (remaining: Actor list) (finished: Actor list) =
         match remaining with
-        | [] -> fixed
+        | [] -> finished
         | actor::rem ->
-            let a = match checkcols actor rem None with
-            | Some(col) ->
-                handle_collision col
-                { actor with Pos = actor.Pos + col.mov; }
-            | None ->
-                match actor.Type with
-                | Player(_, vel, rot) | Active(vel, rot) ->
-                    { actor with Pos = actor.Pos + vel}
-                | _ -> failwith "Attempting to move obstacle :i"
-            move_objs rem a::fixed
+            let a =
+                match checkcols actor rem None with
+                | Some(col) ->
+                    handle_collision col
+                    { actor with Pos = actor.Pos + col.mov; }
+                | None ->
+                    match actor.Type with
+                    | Player(_, vel, rot) | Active(vel, rot) ->
+                        { actor with Pos = actor.Pos + vel; }
+                    | _ -> failwith "Attempting to move obstacle :i"
+            (move_objs rem (a::finished))
 
     move_objs dyn stc
