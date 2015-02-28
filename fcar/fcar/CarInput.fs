@@ -6,15 +6,15 @@ open CarActor
 
 let maxS = 5.0f // Max speed
 let incS = 0.1f // Speed inc
+let rotS = 0.1f // Rotation speed
 
 type keyBinding = {up:Keys; down:Keys; left:Keys; right:Keys;}
     
 let HandleInput (kbs:KeyboardState) actor =
     let newSpeed (inc:float32) max  dir = if (System.Math.Abs (dir + inc)) > maxS then max else dir + inc
-    let newRot (r:Vector2) deg = 
-        Vector2(
-            (r.X * (float32)(System.Math.Cos deg)) - (r.X * (float32)(System.Math.Sin deg)),
-            (r.Y * (float32)(System.Math.Sin deg)) + (r.Y * (float32)(System.Math.Cos deg)))
+    let newRot (r:Vector2) dir = 
+        let x, y = -r.Y, r.X
+        Vector2.Normalize(r * Vector2(x * dir * rotS, y * dir * rotS))
 
     let rec HandleKeys keys (kb, speed, rot) =
         match keys with
@@ -23,8 +23,8 @@ let HandleInput (kbs:KeyboardState) actor =
             match x with
                 | x when x = kb.up      -> HandleKeys xs (kb, (newSpeed  incS  maxS speed), rot)
                 | x when x = kb.down    -> HandleKeys xs (kb, (newSpeed -incS -maxS speed), rot)
-                | x when x = kb.left    -> HandleKeys xs (kb, speed, (newRot rot 0.1))
-                | x when x = kb.right   -> HandleKeys xs (kb, speed, (newRot rot 0.1))
+                | x when x = kb.left    -> HandleKeys xs (kb, speed, (newRot rot 1.f))
+                | x when x = kb.right   -> HandleKeys xs (kb, speed, (newRot rot -1.f))
                 | _ -> HandleKeys xs (kb, speed, rot)
 
     match actor.Type with
