@@ -12,7 +12,7 @@ type Cargame () as x =
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
  
     do
-        x.Window.Title <- "Test Game"
+        x.Window.Title <- "fcar Super GAME!!!"
         graphics.PreferredBackBufferHeight <- 640
         graphics.PreferredBackBufferWidth <- 640
 
