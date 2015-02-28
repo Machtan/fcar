@@ -26,12 +26,12 @@ type Cargame () as x =
 
     let mutable WorldObjects = lazy (
         [
-            (1,"car.png", Player(1, 0.f, Vector2(0.f,0.f)), Vector2(32.f,32.f), Circle(16.f));
+            (1,"car.png", Player(1, 0.f, Vector2(1.f,0.f)), Vector2(32.f,32.f), Circle(16.f));
             (2, "obstacle.png", Obstacle, Vector2(128.f, 128.f), Circle(16.f));
             (3, "obstacle.png", Obstacle, Vector2(128.f, 160.f), Circle(16.f));
             (4, "obstacle.png", Obstacle, Vector2(256.f, 128.f), Circle(16.f));
             (5, "obstacle.png", Obstacle, Vector2(256.f, 256.f), Circle(16.f));
-            (6,"car.png", Player(2, 0.f, Vector2(0.f,0.f)), Vector2(32.f,128.f), Circle(16.f));
+            (6,"car.png", Player(2, 0.f, Vector2(1.f,0.f)), Vector2(32.f,128.f), Circle(16.f));
         ] |> List.map CreateActor'
     )
 

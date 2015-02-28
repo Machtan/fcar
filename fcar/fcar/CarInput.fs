@@ -15,7 +15,7 @@ let newSpeed (inc:float32) max  oldS = if (System.Math.Abs (oldS + inc)) > maxS
                                        then max 
                                        else oldS + inc
 //Finding a new rotation from: the old(r) and a diraktion(dir[1,-1])
-let newRot (r:Vector2) dir = Vector2.Normalize(r * Vector2(
+let newRot (r:Vector2) dir = Vector2.Normalize(r + Vector2(
                                                         -r.Y * dir * rotS, 
                                                          r.X * dir * rotS))
 
@@ -27,8 +27,8 @@ let HandleInput (kbs:KeyboardState) actor =
             match x with
                 | x when x = kb.up      -> HandleKeys xs (kb, (newSpeed  incS  maxS speed), rot)
                 | x when x = kb.down    -> HandleKeys xs (kb, (newSpeed -incS -maxS speed), rot)
-                | x when x = kb.left    -> HandleKeys xs (kb, speed, (newRot rot 1.f))
-                | x when x = kb.right   -> HandleKeys xs (kb, speed, (newRot rot -1.f))
+                | x when x = kb.left    -> HandleKeys xs (kb, speed, (newRot rot -1.f))
+                | x when x = kb.right   -> HandleKeys xs (kb, speed, (newRot rot 1.f))
                 | _ -> HandleKeys xs (kb, speed, rot)
 
     match actor.Type with
