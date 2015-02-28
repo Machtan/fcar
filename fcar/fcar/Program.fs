@@ -26,6 +26,7 @@ module main =
         0
     
 #else
+[<EntryPoint>]
 let main args =
     let game = new Cargame()
     game.Run()

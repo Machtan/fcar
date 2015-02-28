@@ -1,4 +1,5 @@
 ﻿//https://bruinbrown.wordpress.com/2013/10/06/making-a-platformer-in-f-with-monogame/
+//http://ideone.com/uWE14c
 module TestPlatformerGame
  
 open Microsoft.Xna.Framework
@@ -15,14 +16,27 @@ type Cargame () as x =
     let graphics = new GraphicsDeviceManager(x)
     let mutable spriteBatch = Unchecked.defaultof<SpriteBatch>
  
+    do
+        x.Window.Title <- "Test Game"
+        graphics.PreferredBackBufferHeight <- 200
+        graphics.PreferredBackBufferWidth <- 800
+
     let CreateActor' = CreateActor x.Content
  
     let mutable WorldObjects = lazy (
         [
             ("player.png", Player(Nothing), Vector2(10.f,28.f), Vector2(32.f,32.f), false);
-            ("obstacle.png", Obstacle, Vector2(10.f,60.f), Vector2(32.f,32.f), true);
-            ("obstacle.png", Obstacle, Vector2(74.f,92.f), Vector2(32.f,32.f), true);
-            ("obstacle.png", Obstacle, Vector2(42.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(0.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(32.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(64.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(96.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(128.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(160.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(192.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(224.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(256.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(288.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(320.f,60.f), Vector2(32.f,32.f), true);
         ] |> List.map CreateActor'
     )
 
