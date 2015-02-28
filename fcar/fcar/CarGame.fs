@@ -31,7 +31,9 @@ type Cargame () as x =
             (3, "obstacle.png", Obstacle, Vector2(128.f, 160.f), Circle(16.f));
             (4, "obstacle.png", Obstacle, Vector2(256.f, 128.f), Circle(16.f));
             (5, "obstacle.png", Obstacle, Vector2(256.f, 256.f), Circle(16.f));
-            (6,"car.png", Player(2, 0.f, Vector2(1.f,0.f)), Vector2(32.f,128.f), Circle(16.f));
+            (6, "car.png", Player(2, 0.f, Vector2(1.f,0.f)), Vector2(32.f,128.f), Circle(16.f));
+            (7, "logo.png", Decoration, Vector2(200.f, 200.f), Empty);
+            (8, "car.png", Decoration, Vector2(200.f, 250.f), Empty);
         ] |> List.map CreateActor'
     )
 
@@ -40,7 +42,7 @@ type Cargame () as x =
             let origin =
                 match actor.Geom with
                 | Circle(r) -> Vector2(r, r)
-                | _ -> actor.Pos
+                | _ -> Vector2.Zero
             let angle =
                 match actor.Type with
                 | Player(_, vel, dir) -> VectorToAngle dir

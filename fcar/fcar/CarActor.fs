@@ -8,11 +8,13 @@ type ActorType =
     | Player of int * float32 * Vector2
     | Active of Vector2 * Vector2
     | Obstacle
+    | Decoration
 
 type ColGeom =
     | Circle of float32
     | Rect of float32 * float32
     | Compound of ColGeom * ColGeom
+    | Empty
 
 type Actor =
     {

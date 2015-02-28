@@ -52,7 +52,8 @@ let get_collision actor check =
         | _ -> failwith "Collision check invoked for static actor"
 
 let Move objects =
-    let stc, dyn = objects |> List.partition (fun a -> a.Type = Obstacle)
+    let dec, solid = objects |> List.partition (fun a -> a.Type = Decoration)
+    let stc, dyn = solid |> List.partition (fun a -> a.Type = Obstacle)
 
     let rec checkcols actor targets col =
         match targets with
@@ -90,7 +91,7 @@ let Move objects =
                     | _ -> failwith "Attempting to move obstacle or Active :i"
             (move_objs rem (a::finished))
 
-    move_objs dyn stc
+    dec @ (move_objs dyn stc)
 
 let AddFriction actor =
     match actor.Type with
