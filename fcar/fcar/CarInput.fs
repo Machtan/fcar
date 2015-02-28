@@ -14,8 +14,8 @@ let HandleInput (kbs:KeyboardState) actor =
     let rec HandleKeys keys (pn, vel:Vector2) =
         let newXY (incs:float32) max  dir = if (System.Math.Abs (dir + incs)) > maxvx then max else dir + incs
         let kb = match pn with
-                    | 1 -> {up = Keys.Up; down = Keys.Down; left = Keys.Left; right = Keys.Right;}
-                    | 2 -> {up = Keys.W; down = Keys.S; left = Keys.A; right = Keys.D;}
+                    | 1 -> {up = Keys.Up;   down = Keys.Down;   left = Keys.Left;   right = Keys.Right;}
+                    | 2 -> {up = Keys.W;    down = Keys.S;      left = Keys.A;      right = Keys.D;}
                     | _ -> failwith "No keybinding for this player"
         match keys with
         | [] -> vel
@@ -29,7 +29,7 @@ let HandleInput (kbs:KeyboardState) actor =
     match actor.Type with
     | Player(pn,init_vel,rot) ->
         let velocity = HandleKeys (kbs.GetPressedKeys() |> Array.toList) (pn, init_vel)
-        printfn "Player: %i vel: %f %f" pn velocity.X velocity.Y
+        //printfn "Player: %i vel: %f %f" pn velocity.X velocity.Y
         { 
             actor with 
                 Type = Player(pn,velocity,rot) 
