@@ -9,13 +9,16 @@ let incS = 0.1f // Speed inc
 let rotS = 0.1f // Rotation speed
 
 type keyBinding = {up:Keys; down:Keys; left:Keys; right:Keys;}
-    
-let HandleInput (kbs:KeyboardState) actor =
-    let newSpeed (inc:float32) max  dir = if (System.Math.Abs (dir + inc)) > maxS then max else dir + inc
-    let newRot (r:Vector2) dir = 
-        let x, y = -r.Y, r.X
-        Vector2.Normalize(r * Vector2(x * dir * rotS, y * dir * rotS))
+//Finding a new speed from: a incrisment(int), a max speed(maxS) and the old speed(oldS)
+let newSpeed (inc:float32) max  oldS = if (System.Math.Abs (oldS + inc)) > maxS 
+                                       then max 
+                                       else oldS + inc
+//Finding a new rotation from: the old(r) and a diraktion(dir[1,-1])
+let newRot (r:Vector2) dir = Vector2.Normalize(r * Vector2(
+                                                        -r.Y * dir * rotS, 
+                                                         r.X * dir * rotS))
 
+let HandleInput (kbs:KeyboardState) actor =
     let rec HandleKeys keys (kb, speed, rot) =
         match keys with
         | []      -> speed, rot
