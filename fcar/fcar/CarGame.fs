@@ -41,6 +41,11 @@ type Cargame () as x =
  
     override x.Update (gameTime) =
         let HandleInput' = HandleInput (Keyboard.GetState ())
+        let current = WorldObjects.Value
+        do WorldObjects <- lazy (
+            current
+            |> List.map HandleInput')
+        do WorldObjects.Force () |> ignore
         ()
  
     override x.Draw (gameTime) =
