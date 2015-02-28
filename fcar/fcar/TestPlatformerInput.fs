@@ -17,11 +17,14 @@ let HandleInput (kbs:KeyboardState) actor =
             match x with
             | Keys.Left | Keys.Right -> 
                 let new_vx = 
-                    let dx = if x = Keys.Right then xinc else -xinc
-                    let max = if x = Keys.Right then maxvx else -maxvx
-                    if (vel.X + dx) < max
+                    let r = (x = Keys.Right)
+                    let dx = if r then xinc else -xinc
+                    let max = if r then maxvx else -maxvx
+                    let nx = vel.X + dx
+                    let too_high = if r then nx > max else nx < max
+                    if too_high
                     then max
-                    else vel.X + dx
+                    else nx
                 HandleKeys xs (Vector2(new_vx, vel.Y), state)
             | Keys.Space -> 
                 match state with

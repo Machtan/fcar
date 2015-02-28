@@ -3,9 +3,7 @@
 #if TARGET_MAC
 open MonoMac.AppKit
 open MonoMac.Foundation
-#endif
 
-#if TARGET_MAC
 type AppDelegate() = 
     inherit NSApplicationDelegate()
     
@@ -15,7 +13,7 @@ type AppDelegate() =
     
     override x.ApplicationShouldTerminateAfterLastWindowClosed(sender) =
         true
-        
+
 module main =
     [<EntryPoint>]
     let main args =
@@ -31,5 +29,5 @@ let main args =
     let game = new Cargame()
     game.Run()
     0
-    
+
 #endif
