@@ -27,8 +27,8 @@ let HandleInput (kbs:KeyboardState) actor =
             match x with
                 | x when x = kb.up      -> HandleKeys xs (kb, (newSpeed  incS  maxS speed), rot)
                 | x when x = kb.down    -> HandleKeys xs (kb, (newSpeed -incS -maxS speed), rot)
-                | x when x = kb.left    -> HandleKeys xs (kb, speed, (newRot rot -1.f))
-                | x when x = kb.right   -> HandleKeys xs (kb, speed, (newRot rot 1.f))
+                | x when x = kb.left    -> HandleKeys xs (kb, speed, (newRot rot (-1.f * (System.Math.Abs (speed) / maxS))))
+                | x when x = kb.right   -> HandleKeys xs (kb, speed, (newRot rot ( 1.f * (System.Math.Abs (speed) / maxS))))
                 | _ -> HandleKeys xs (kb, speed, rot)
 
     match actor.Type with
