@@ -19,27 +19,34 @@ type ActorType =
  
 type WorldActor =
     {
-        ActorType : ActorType;
-        Position : Vector2;
-        Size : Vector2;
-        Texture : Texture2D option;
-        BodyType : BodyType
+        ActorType   : ActorType;
+        Pos         : Vector2;
+        Size        : Vector2;
+        Texture     : Texture2D option;
+        BodyType    : BodyType
     }
-    member this.CurrentBounds
-        with get () = Rectangle((int this.Position.X),(int this.Position.Y),(int this.Size.X),(int this.Size.Y))
+    member this.Bounds
+        with get () = Rectangle((int this.Pos.X),(int this.Pos.Y),(int this.Size.X),(int this.Size.Y))
  
-    member this.DesiredBounds
-        with get () = let desiredPos = match this.BodyType with
-                                       | Dynamic(s) -> this.Position + s
-                                       | _          -> this.Position
-                      Rectangle((int desiredPos.X), (int desiredPos.Y), (int this.Size.X), (int this.Size.Y))
+    member this.NextBounds
+        with get () = 
+            let pos = 
+                match this.BodyType with
+                | Dynamic(s) -> this.Pos + s
+                | _          -> this.Pos
+            Rectangle((int  pos.X), (int  pos.Y), (int this.Size.X), (int this.Size.Y))
 
 let CreateActor (content:ContentManager) (textureName, actorType, position, size, isStatic) =
-    let tex = if not (System.String.IsNullOrEmpty textureName) 
-                then Some(content.Load textureName)
-                else None
-    let bt = if isStatic 
-                then Static
-                else Dynamic(Vector2(0.f,0.f))
-    { ActorType = actorType; Position = position; Size = size; Texture = tex; BodyType = bt; }
+    let tex = 
+        if not (System.String.IsNullOrEmpty textureName) 
+        then Some(content.Load textureName)
+        else None
+    let bt = 
+        if isStatic 
+        then Static
+        else Dynamic(Vector2(0.f,0.f))
+    {   
+        ActorType = actorType; Pos = position; 
+        Size = size; Texture = tex; BodyType = bt; 
+    }
 

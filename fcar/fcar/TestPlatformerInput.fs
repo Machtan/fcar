@@ -36,5 +36,9 @@ let HandleInput (kbs:KeyboardState) actor =
             | Dynamic(v)   -> v
             | _            -> Vector2()
         let velocity = HandleKeys (kbs.GetPressedKeys() |> Array.toList) (init_vel, s)
-        { actor with BodyType = Dynamic(velocity); ActorType = Player(Jumping) }
+        { 
+            actor with 
+                BodyType = Dynamic(velocity); 
+                ActorType = Player(Jumping) 
+        }
     | _ -> actor

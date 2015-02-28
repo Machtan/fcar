@@ -6,8 +6,8 @@ open TestPlatformerActor
 
 let IsActorStatic actor =
     match actor.BodyType with
-    | Static    -> true
-    | _         -> false
+    | Static -> true
+    | _ -> false
 
 let PartitionWorldObjects worldObjects =
     worldObjects
@@ -27,24 +27,33 @@ let HandleCollisions worldObjects =
 
     let FindOptimumCollision a b =
         match a.ActorType,b.ActorType with
-        | Player(h), Obstacle -> match a.BodyType, b.BodyType with
-                                    | Dynamic (s), Static   -> { a with BodyType = Dynamic((FindNewVelocity a.DesiredBounds b.CurrentBounds s)); ActorType = Player(Nothing) }
-                                    | _                     -> a
-        | _                   -> a
+        | Player(h), Obstacle -> 
+            match a.BodyType, b.BodyType with
+            | Dynamic (s), Static -> 
+                { 
+                    a with 
+                        BodyType = Dynamic((FindNewVelocity a.NextBounds b.Bounds s));
+                        ActorType = Player(Nothing);
+                }
+            | _ -> a
+        | _ -> a
 
     let rec FigureCollisions (actor:WorldActor) (sortedActors:WorldActor list) =
         match sortedActors with
-        | []        -> actor
-        | x :: xs   -> let a = if actor.DesiredBounds.Intersects x.DesiredBounds 
-                                then FindOptimumCollision actor x
-                                else actor
-                       FigureCollisions a xs
+        | [] -> actor
+        | x :: xs -> 
+            let a = 
+                if actor.NextBounds.Intersects x.NextBounds 
+                then FindOptimumCollision actor x
+                else actor
+            FigureCollisions a xs
 
     let rec FixCollisions (toFix:WorldActor list) (alreadyFixed:WorldActor list) =
         match toFix with
-        | []        -> alreadyFixed
-        | x :: xs   -> let a = FigureCollisions x alreadyFixed
-                       FixCollisions xs (a::alreadyFixed)
+        | [] -> alreadyFixed
+        | x :: xs -> 
+            let a = FigureCollisions x alreadyFixed
+            FixCollisions xs (a::alreadyFixed)
 
     FixCollisions dyn stc
 
@@ -52,17 +61,19 @@ let AddGravity (gameTime:GameTime) actor =
     let ms = gameTime.ElapsedGameTime.TotalMilliseconds
     let g = ms * 0.01
     match actor.BodyType with
-    | Dynamic(s) -> let d = Vector2(s.X, s.Y + (float32 g))
-                    { actor with BodyType = Dynamic(d); }
-    | _          -> actor
+    | Dynamic(s) -> 
+        let d = Vector2(s.X, s.Y + (float32 g))
+        { actor with BodyType = Dynamic(d); }
+    | _  -> actor
 
 let AddFriction actor = 
     match actor.BodyType with
-    | Dynamic (v) -> let newV = Vector2(v.X*0.95f, v.Y)
-                     { actor with BodyType = Dynamic(newV) }
-    | _           -> actor
+    | Dynamic (v) -> 
+        let newV = Vector2(v.X*0.95f, v.Y)
+        { actor with BodyType = Dynamic(newV) }
+    | _ -> actor
 
 let ResolveVelocities actor =
     match actor.BodyType with
-    | Dynamic (s) -> { actor with Position = actor.Position + s }
-    | _           -> actor
+    | Dynamic (s) -> { actor with Pos = actor.Pos + s }
+    | _ -> actor

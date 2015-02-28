@@ -17,15 +17,18 @@ type Cargame () as x =
  
     let CreateActor' = CreateActor x.Content
  
-    let mutable WorldObjects = lazy ([  ("player.png", Player(Nothing), Vector2(10.f,28.f), Vector2(32.f,32.f), false);
-                                        ("obstacle.png", Obstacle, Vector2(10.f,60.f), Vector2(32.f,32.f), true);
-                                        ("obstacle.png", Obstacle, Vector2(74.f,92.f), Vector2(32.f,32.f), true);
-                                        ("obstacle.png", Obstacle, Vector2(42.f,60.f), Vector2(32.f,32.f), true);]
-                                    |> List.map CreateActor')
+    let mutable WorldObjects = lazy (
+        [
+            ("player.png", Player(Nothing), Vector2(10.f,28.f), Vector2(32.f,32.f), false);
+            ("obstacle.png", Obstacle, Vector2(10.f,60.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(74.f,92.f), Vector2(32.f,32.f), true);
+            ("obstacle.png", Obstacle, Vector2(42.f,60.f), Vector2(32.f,32.f), true);
+        ] |> List.map CreateActor'
+    )
 
     let DrawActor (sb:SpriteBatch) actor =
         if actor.Texture.IsSome 
-            then do sb.Draw(actor.Texture.Value, actor.Position, Color.White)
+            then do sb.Draw(actor.Texture.Value, actor.Pos, Color.White)
         ()
 
     override x.Initialize() =
@@ -41,12 +44,14 @@ type Cargame () as x =
         let AddGravity' = AddGravity gameTime
         let HandleInput' = HandleInput (Keyboard.GetState ())
         let current = WorldObjects.Value
-        do WorldObjects <- lazy (current
-                                 |> List.map HandleInput'
-                                 |> List.map AddGravity'
-                                 |> List.map AddFriction
-                                 |> HandleCollisions
-                                 |> List.map ResolveVelocities)
+        do WorldObjects <- lazy (
+            current
+            |> List.map HandleInput'
+            |> List.map AddGravity'
+            |> List.map AddFriction
+            |> HandleCollisions
+            |> List.map ResolveVelocities
+        )
         do WorldObjects.Force () |> ignore
         ()
  
@@ -54,7 +59,6 @@ type Cargame () as x =
         do x.GraphicsDevice.Clear Color.CornflowerBlue
         let DrawActor' = DrawActor spriteBatch
         do spriteBatch.Begin ()
-        WorldObjects.Value
-        |> List.iter DrawActor'
+        WorldObjects.Value |> List.iter DrawActor'
         do spriteBatch.End ()
         ()
