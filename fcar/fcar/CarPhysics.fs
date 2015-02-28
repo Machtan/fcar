@@ -74,9 +74,6 @@ let Move objects =
 let AddFriction actor = 
     match actor.Type with
     | Player(id, v, rot) -> 
-        let newV = Vector2(v.X*0.95f, v.Y)
+        let newV = Vector2(v.X*0.995f, v.Y)
         { actor with Type = Player(id, newV, rot) }
-    | Active(v, rot) ->
-        let newV = Vector2(v.X*0.95f, v.Y)
-        { actor with Type = Active(newV, rot) }
     | _ -> actor

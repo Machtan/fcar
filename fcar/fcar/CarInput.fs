@@ -19,8 +19,8 @@ let HandleInput (kbs:KeyboardState) actor =
             match x with
                 | x when x = kb.up      -> HandleKeys xs (kb, Vector2(       (newXY  inc  maxvx vel.X), vel.Y))
                 | x when x = kb.down    -> HandleKeys xs (kb, Vector2(       (newXY -inc -maxvx vel.X), vel.Y))
-                | x when x = kb.left    -> HandleKeys xs (kb, Vector2(vel.X, (newXY  inc  maxvx vel.Y)       ))
-                | x when x = kb.right   -> HandleKeys xs (kb, Vector2(vel.X, (newXY -inc -maxvx vel.Y)       ))
+                | x when x = kb.left    -> HandleKeys xs (kb, Vector2(vel.X, (newXY -inc -maxvx vel.Y)       ))
+                | x when x = kb.right   -> HandleKeys xs (kb, Vector2(vel.X, (newXY  inc  maxvx vel.Y)       ))
                 | _ -> HandleKeys xs (kb, vel)
 
     match actor.Type with
