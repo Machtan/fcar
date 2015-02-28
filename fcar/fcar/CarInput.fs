@@ -9,6 +9,7 @@ let incS = 0.1f // Speed inc
 let rotS = 0.1f // Rotation speed
 
 type keyBinding = {up:Keys; down:Keys; left:Keys; right:Keys;}
+
 //Finding a new speed from: a incrisment(int), a max speed(maxS) and the old speed(oldS)
 let newSpeed (inc:float32) max  oldS = if (System.Math.Abs (oldS + inc)) > maxS 
                                        then max 
