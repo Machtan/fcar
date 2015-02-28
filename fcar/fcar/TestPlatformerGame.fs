@@ -8,7 +8,7 @@ open TestPlatformerActor
 open TestPlatformerPhysics
 open TestPlatformerInput
  
-type Game1 () as x =
+type Cargame () as x =
     inherit Game()
  
     do x.Content.RootDirectory <- "assets"

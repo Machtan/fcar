@@ -12,3 +12,12 @@ dependencies = [
     "Tao.Sdl",
     "MonoGame.Framework"
 ]
+
+# The order of these is important!
+# (Maybe I'll add a dependency graph at some point)
+modules = [ 
+    "TestPlatformerActor",
+    "TestPlatformerPhysics", #requires actor
+    "TestPlatformerInput", #requires actor
+    "TestPlatformerGame", #requires all three
+]

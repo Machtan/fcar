@@ -31,6 +31,7 @@ def load_spec():
         ensure_not_missing("main")
         ensure_not_missing("assets")
         ensure_not_missing("dependencies")
+        ensure_not_missing("modules")
         ensure_not_missing("developer")
         ensure_not_missing("authors")
         ensure_not_missing("version")
@@ -42,32 +43,33 @@ def load_spec():
         else:
             return spec
 
+def newer(src, dst):
+    """Returns whether the first path is newer than the second"""
+    if not os.path.exists(dst):
+        return True
+    else:
+        return os.stat(src).st_ctime > os.stat(dst).st_ctime
+
+def replace_if_newer(source, destination):
+    """Replaces the file at destination with the file at source if the source is newer"""
+    if newer(source, destination):
+        if os.path.exists(destination):
+            os.remove(destination)
+        shutil.copy(source, destination)
+
 def ensure_build():
     if not os.path.exists(BUILD_DIR):
         os.makedirs(BUILD_DIR)
-            
-def reference(dep):
-    return "-r:{}.dll".format(dep)
 
-def bundle(clean=True):
+def bundle(clean=False, release=False):
     """Bundles the target as a mac application"""
-    def remove_if_clean(path, isdir=False, msg=""):
-        if msg:
-            print(msg)
+    def remove_if_clean(path):
         if clean and os.path.exists(path):
-            if isdir:
-                os.rmdir(path)
-            else:
-                os.remove(path)
+            os.remove(path)
     
     def ensure_dir(path):
         if not os.path.exists(path):
             os.mkdir(path)
-    
-    def replace_if_newer(source, destination):
-        if os.stat(source).st_ctime > os.stat(destination).st_ctime:
-            os.remove(destination)
-            shutil.copy(source, destination)
     
     # For the love of god
     pj = os.path.join
@@ -76,6 +78,7 @@ def bundle(clean=True):
     AUTHORS = specs['authors']
     NAME = specs['name']
     DEPS = specs['dependencies']
+    MODS = specs['modules']
     DEV = specs['developer']
     ASSETS = specs['assets']
     VERSION = specs['version']
@@ -137,14 +140,21 @@ def bundle(clean=True):
     exe_src = pj(BUILD_DIR, EXE_NAME)
     remove_if_clean(exe_path)
     shutil.copy(exe_src, exe_path)
-    for dep in DEPS:
-        fullname = dep+".dll"
-        dep_src_path = pj(BINARIES_DIR, fullname)
-        dep_dst_path = pj(BUNDLE_DIR, fullname)
-        if not os.path.exists(dep_dst_path):
-            shutil.copy(dep_src_path, dep_dst_path)
-        else:
-            replace_if_newer(dep_src_path, dep_dst_path)
+    
+    # Copy all dlls if this is not a release build
+    if not release:
+        print("> Copying binaries/assemblies...")
+        for dep in DEPS:
+            fullname = dep + ".dll"
+            dep_src = pj(BINARIES_DIR, fullname)
+            dep_dst = pj(BUNDLE_DIR, fullname)
+            replace_if_newer(dep_src, dep_dst)
+    
+        for mod in MODS:
+            fullname = mod + ".dll"
+            mod_src = pj(BUILD_DIR, fullname)
+            mod_dst = pj(BUNDLE_DIR, fullname)
+            replace_if_newer(mod_src, mod_dst)
     
     # Move the Assets
     print("> Adding assets...")
@@ -152,8 +162,7 @@ def bundle(clean=True):
     ensure_dir(RES_DIR)
     icon_dst = pj(RES_DIR, ICON_NAME)
     icon_src = ICON_NAME
-    if not os.path.exists(icon_dst):
-        shutil.copy(icon_src, icon_dst)
+    replace_if_newer(icon_src, icon_dst)
     
     ensure_dir(pj(RES_DIR, os.path.basename(ASSETS)))
     for dirpath, dirnames, filenames in os.walk(ASSETS):
@@ -169,15 +178,12 @@ def bundle(clean=True):
             file_src = pj(dirpath, filename)
             file_dst = pj(RES_DIR, dirpath, filename)
             print(">>> file: src/dst '{}' / '{}'".format(file_src, file_dst))
-            if not os.path.exists(file_dst):
-                shutil.copy(file_src, file_dst)
-            else:
-                replace_if_newer(file_src, file_dst)
+            replace_if_newer(file_src, file_dst)
     
     print("> Done!")
     print("> Saved to '{}'".format(APP_DIR))
 
-def build(platform="mac"):
+def build(platform="mac", release=False):
     """Builds the F# program from the given specification dictionary"""
     specs = load_spec()
     ensure_build()
@@ -187,25 +193,56 @@ def build(platform="mac"):
     cmd.append("--nologo")
     
     cmd.append("-I:{}".format(BINARIES_DIR))
+    cmd.append("-I:{}".format(BUILD_DIR))
     
     if platform == "mac":
         cmd.append("-d:TARGET_MAC")
     
-    main_file = specs['main']
-    cmd.append(main_file)
+    for dep in specs['dependencies']:
+        cmd.append("-r:{}.dll".format(dep))
     
+    # Build the submodules in the right order
+    mods = specs['modules']
+    submodules = []
+    recompile = False
+    for mod in mods:
+        script = mod + ".fs"
+        mod_name = mod + ".dll"
+        mod_dst = os.path.join(BUILD_DIR, mod_name)
+        if recompile or newer(script, mod_dst):
+            print("> Building '{}'...".format(script))
+            recompile = True #  Make sure to also recompile the dependent scripts
+            
+            # Compile the module
+            mod_cmd = cmd + [script, "-a", "-o:{}".format(mod_dst)] + submodules
+            print("$ {}".format(" ".join(mod_cmd)))
+            exit_status = subprocess.call(mod_cmd)
+            if exit_status: #  Interrupt on fail
+                print("> Failed to build submodule '{}'".format(mod_name))
+                return exit_status
+        else:
+            print("> '{}' was built, skipping...".format(mod_name))
+            
+        submodules.append("-r:{}".format(mod_name))
+    
+    # Build the main program
+    if release:
+        cmd.append("--standalone")
+        
     out_file_name = specs['name'] + EXTENSION
     out_file = os.path.join(BUILD_DIR, out_file_name)
     cmd.append("-o:{}".format(out_file))
     
-    for dep in specs['dependencies']:
-        cmd.append(reference(dep))
+    main_file = specs['main']
+    cmd.append(main_file)
+    cmd.extend(submodules)
     
     print("$ {}".format(" ".join(cmd)))
     built = subprocess.call(cmd)
     if built: # Exit on failure
         return built
     
+    # Bundle the program if on mac
     if platform == "mac":
         bundled = bundle()
         return bundled
@@ -239,6 +276,17 @@ def run(force_recompile=False, args=[]):
     print("$ {}".format(" ".join(cmd)))
     return subprocess.call(cmd)
 
+def clean():
+    """Cleans the build directory"""
+    for dirpath, dirnames, filenames in os.walk(BUILD_DIR):
+        for dirname in dirnames:
+            if dirname.endswith(".app"):
+                shutil.rmtree(os.path.join(dirpath, dirname))
+        for filename in filenames:
+            if not filename.startswith("."):
+                os.remove(os.path.join(dirpath, filename))
+    print("> All clean!")
+
 def main(args=sys.argv[1:]):
     """Entry point"""
     # Prepare
@@ -261,6 +309,10 @@ def main(args=sys.argv[1:]):
     bundle_desc = "Bundles the project"
     bundle_parser = subparsers.add_parser("bundle", description=bundle_desc)
     bundle_parser.set_defaults(func=bundle)
+    
+    clean_desc = "Cleans the target directory"
+    clean_parser = subparsers.add_parser("clean", description=clean_desc)
+    clean_parser.set_defaults(func=clean)
     
     # Parse
     parsed = parser.parse_args()
