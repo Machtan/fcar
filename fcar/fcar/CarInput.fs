@@ -20,11 +20,6 @@ let HandleInput (kbs:KeyboardState) actor =
             | Keys.Left  -> HandleKeys xs (Vector2(vel.Y, (newXY -inc -maxvx)),  state)
             | Keys.Right -> HandleKeys xs (Vector2(vel.Y, (newXY inc maxvx)),  state)
             | _ -> HandleKeys xs (vel, state)
-            | Keys.Space -> 
-                match state with
-                | Nothing -> 
-                    HandleKeys xs (Vector2(vel.X, vel.Y - gravity), Jumping)
-                | Jumping -> HandleKeys xs (vel, state)
     match actor.ActorType with
     | Player(s) -> 
         let init_vel = 
