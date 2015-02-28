@@ -1,4 +1,4 @@
-﻿open TestPlatformerGame
+﻿open CarGame
 
 #if TARGET_MAC
 open MonoMac.AppKit

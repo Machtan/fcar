@@ -8,13 +8,7 @@ let maxvx = 5.0f // Max x velocity
 let inc = 1.0f // x velocity increment
 let gravity = 4.0f // How fast you fall
 
-type keyBinding = 
-    {
-        up:Keys; 
-        down:Keys; 
-        left:Keys; 
-        right:Keys;
-    }
+type keyBinding = {up:Keys; down:Keys; left:Keys; right:Keys;}
     
 let HandleInput (kbs:KeyboardState) actor =
     let rec HandleKeys keys (pn, vel:Vector2) =

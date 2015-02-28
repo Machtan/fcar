@@ -10,8 +10,8 @@ type ActorType =
     | Obstacle
 
 type ColGeom =
-    | Circle of float
-    | Rect of float * float
+    | Circle of float32
+    | Rect of float32 * float32
     | Compound of ColGeom * ColGeom
 
 type Actor =
