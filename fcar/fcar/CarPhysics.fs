@@ -3,7 +3,9 @@ module CarPhysics
 open Microsoft.Xna.Framework
 open CarActor
 
-let FRICTION = 0.995f
+let FRICTION = 0.95f
+let HIT_FRICTION = 0.5f
+let VEL_TRESHOLD = 0.001f
 
 type Collision = {
     actor: Actor;
@@ -13,7 +15,14 @@ type Collision = {
 }
 
 let handle_collision col =
-    printfn "Handling collision"
+    //printfn "Handling collision"
+    let a =
+        match col.actor.Type with
+        | Player(n, vel, dir) ->
+            let nv = vel * HIT_FRICTION
+            Player(n, (if nv < VEL_TRESHOLD then 0.f else nv), dir)
+        | other -> other
+    (a, col.mov, col.target)
 
 let get_collision actor check =
     match actor.Type with
@@ -68,11 +77,11 @@ let Move objects =
             let a =
                 match checkcols actor finished None with
                 | Some(col) ->
-                    handle_collision col
-                    match actor.Type with
+                    let (na, nm, nt) = handle_collision col
+                    (*match actor.Type with
                     | Player(num, _, _) ->
                         printfn "Moving player %i by (%f, %f)" num col.mov.X col.mov.Y
-                    | _ -> ()
+                    | _ -> ()*)
                     { actor with Pos = actor.Pos + col.mov; }
                 | None ->
                     match actor.Type with
