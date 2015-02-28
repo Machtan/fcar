@@ -17,7 +17,7 @@ dependencies = [
 # (Maybe I'll add a dependency graph at some point)
 modules = [
     "CarActor",
-    "CarPhysics",
     "CarInput",
+    "CarPhysics",
     "CarGame",
 ]

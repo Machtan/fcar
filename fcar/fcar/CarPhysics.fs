@@ -19,17 +19,21 @@ let get_collision actor check =
             let bodies = (actor.Geom, check.Geom)
             match bodies with
                 | (Circle(ar), Circle(cr)) ->
-                    let dr = ar + cr
-                    let d = check.Pos - (actor.Pos + vel)
-                    let dist = d.Length()
-                    let diff = dist - dr
-                    if diff < 0.0f
-                    then Some ({ actor = actor;
-                        mov = vel + (Vector2.Normalize(vel) * diff);
-                        dist = System.Math.Abs diff;
-                        target = check;
-                    })
-                    else None
+                    if vel = Vector2.Zero
+                    then None
+                    else
+                        let dr = ar + cr
+                        let d = check.Pos - (actor.Pos + vel)
+                        let dist = d.Length()
+                        let diff = dist - dr
+                        if diff < 0.0f
+                        then
+                            Some ({ actor = actor;
+                            mov = vel + ((Vector2.Normalize vel) * diff);
+                            dist = System.Math.Abs diff;
+                            target = check;
+                            })
+                        else None
 
                 | _ -> failwith "Unhandled body types... sorry"
         | _ -> failwith "Collision check invoked for static actor"
@@ -58,9 +62,13 @@ let Move objects =
         | [] -> finished
         | actor::rem ->
             let a =
-                match checkcols actor rem None with
+                match checkcols actor finished None with
                 | Some(col) ->
                     handle_collision col
+                    (*match actor.Type with
+                    | Player(num, _, _) ->
+                        printfn "Moving player %i by (%f, %f)" num col.mov.X col.mov.Y
+                    | _ -> ()*)
                     { actor with Pos = actor.Pos + col.mov; }
                 | None ->
                     match actor.Type with
@@ -71,9 +79,9 @@ let Move objects =
 
     move_objs dyn stc
 
-let AddFriction actor = 
+let AddFriction actor =
     match actor.Type with
-    | Player(id, v, rot) -> 
+    | Player(id, v, rot) ->
         let newV = Vector2(v.X*0.995f, v.Y)
         { actor with Type = Player(id, newV, rot) }
     | _ -> actor
