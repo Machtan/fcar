@@ -26,12 +26,12 @@ type Cargame () as x =
 
     let mutable WorldObjects = lazy (
         [
-            (1,"car.png", Player(1,Vector2(0.f,0.f), Vector2(0.f,0.f)), Vector2(32.f,32.f), Circle(16.f));
+            (1,"car.png", Player(1, 0.f, Vector2(0.f,0.f)), Vector2(32.f,32.f), Circle(16.f));
             (2, "obstacle.png", Obstacle, Vector2(128.f, 128.f), Circle(16.f));
             (3, "obstacle.png", Obstacle, Vector2(128.f, 160.f), Circle(16.f));
             (4, "obstacle.png", Obstacle, Vector2(256.f, 128.f), Circle(16.f));
             (5, "obstacle.png", Obstacle, Vector2(256.f, 256.f), Circle(16.f));
-            (6,"car.png", Player(2,Vector2(0.f,0.f), Vector2(0.f,0.f)), Vector2(32.f,128.f), Circle(16.f));
+            (6,"car.png", Player(2, 0.f, Vector2(0.f,0.f)), Vector2(32.f,128.f), Circle(16.f));
         ] |> List.map CreateActor'
     )
 
@@ -43,7 +43,7 @@ type Cargame () as x =
                 | _ -> actor.Pos
             let angle =
                 match actor.Type with
-                | Player(_, vel, rot) | Active(vel, rot) -> VectorToAngle vel
+                | Player(_, vel, dir) -> VectorToAngle dir
                 | _ -> 0.0f
             do sb.Draw(actor.Texture.Value, actor.Pos, System.Nullable(),
                 Color.White, angle, origin, 1.0f, SpriteEffects.None, 0.0f)

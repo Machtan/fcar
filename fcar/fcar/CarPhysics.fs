@@ -3,6 +3,8 @@ module CarPhysics
 open Microsoft.Xna.Framework
 open CarActor
 
+let FRICTION = 0.995f
+
 type Collision = {
     actor: Actor;
     mov: Vector2;
@@ -15,27 +17,29 @@ let handle_collision col =
 
 let get_collision actor check =
     match actor.Type with
-        | Player(_, vel, rot) | Active(vel, rot) ->
-            let bodies = (actor.Geom, check.Geom)
-            match bodies with
+        | Player(_, v, dir)->
+            if v = 0.f || dir = Vector2.Zero
+            then None
+            else
+                let bodies = (actor.Geom, check.Geom)
+                let vel = dir * v
+                //printfn "dir: (%f, %f) v: %f Vel: (%f, %f)" dir.X dir.Y v vel.X vel.Y
+                match bodies with
                 | (Circle(ar), Circle(cr)) ->
-                    if vel = Vector2.Zero
-                    then None
-                    else
-                        let dr = ar + cr
-                        let d = check.Pos - (actor.Pos + vel)
-                        let dist = d.Length()
-                        let diff = dist - dr
-                        if diff < 0.0f
-                        then
-                            Some ({ actor = actor;
-                            mov = vel + ((Vector2.Normalize vel) * diff);
-                            dist = System.Math.Abs diff;
-                            target = check;
-                            })
-                        else None
+                    let dr = ar + cr
+                    let d = check.Pos - (actor.Pos + vel)
+                    let dist = d.Length()
+                    let diff = dist - dr
+                    if diff < 0.0f
+                    then
+                        Some ({ actor = actor;
+                        mov = vel + ((Vector2.Normalize vel) * diff);
+                        dist = System.Math.Abs diff;
+                        target = check;
+                        })
+                    else None
 
-                | _ -> failwith "Unhandled body types... sorry"
+                    | _ -> failwith "Unhandled body types... sorry"
         | _ -> failwith "Collision check invoked for static actor"
 
 let Move objects =
@@ -65,23 +69,22 @@ let Move objects =
                 match checkcols actor finished None with
                 | Some(col) ->
                     handle_collision col
-                    (*match actor.Type with
+                    match actor.Type with
                     | Player(num, _, _) ->
                         printfn "Moving player %i by (%f, %f)" num col.mov.X col.mov.Y
-                    | _ -> ()*)
+                    | _ -> ()
                     { actor with Pos = actor.Pos + col.mov; }
                 | None ->
                     match actor.Type with
-                    | Player(_, vel, rot) | Active(vel, rot) ->
-                        { actor with Pos = actor.Pos + vel; }
-                    | _ -> failwith "Attempting to move obstacle :i"
+                    | Player(_, vel, dir) ->
+                        { actor with Pos = actor.Pos + dir * vel; }
+                    | _ -> failwith "Attempting to move obstacle or Active :i"
             (move_objs rem (a::finished))
 
     move_objs dyn stc
 
 let AddFriction actor =
     match actor.Type with
-    | Player(id, v, rot) ->
-        let newV = Vector2(v.X*0.995f, v.Y)
-        { actor with Type = Player(id, newV, rot) }
+    | Player(id, v, dir) ->
+        { actor with Type = Player(id, v * FRICTION, dir) }
     | _ -> actor

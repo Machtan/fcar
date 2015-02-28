@@ -5,7 +5,7 @@ open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Content
 
 type ActorType =
-    | Player of int * Vector2 * Vector2
+    | Player of int * float32 * Vector2
     | Active of Vector2 * Vector2
     | Obstacle
 
@@ -29,9 +29,9 @@ let CreateActor (content:ContentManager) (id, texture, atype, pos, geom) =
         then Some(content.Load texture)
         else None
     {
-        Id = id; 
+        Id = id;
         Type = atype;
         Pos = pos;
-        Texture = tex; 
+        Texture = tex;
         Geom = geom;
     }

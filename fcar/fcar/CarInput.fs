@@ -4,36 +4,40 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Input
 open CarActor
 
-let maxvx = 5.0f // Max x velocity
-let inc = 0.1f // x velocity increment
+let maxS = 5.0f // Max speed
+let incS = 0.1f // Speed inc
+let rotS = 0.1f // Rotation speed
 
 type keyBinding = {up:Keys; down:Keys; left:Keys; right:Keys;}
     
 let HandleInput (kbs:KeyboardState) actor =
-    let newXY (incs:float32) max  dir = if (System.Math.Abs (dir + incs)) > maxvx then max else dir + incs
+    let newSpeed (inc:float32) max  dir = if (System.Math.Abs (dir + inc)) > maxS then max else dir + inc
+    let newRot (r:Vector2) dir = 
+        let x, y = -r.Y, r.X
+        Vector2.Normalize(r * Vector2(x * dir * rotS, y * dir * rotS))
 
-    let rec HandleKeys keys (kb, vel:Vector2) =
+    let rec HandleKeys keys (kb, speed, rot) =
         match keys with
-        | [] -> vel
+        | []      -> speed, rot
         | x :: xs ->
             match x with
-                | x when x = kb.up      -> HandleKeys xs (kb, Vector2(       (newXY  inc  maxvx vel.X), vel.Y))
-                | x when x = kb.down    -> HandleKeys xs (kb, Vector2(       (newXY -inc -maxvx vel.X), vel.Y))
-                | x when x = kb.left    -> HandleKeys xs (kb, Vector2(vel.X, (newXY -inc -maxvx vel.Y)       ))
-                | x when x = kb.right   -> HandleKeys xs (kb, Vector2(vel.X, (newXY  inc  maxvx vel.Y)       ))
-                | _ -> HandleKeys xs (kb, vel)
+                | x when x = kb.up      -> HandleKeys xs (kb, (newSpeed  incS  maxS speed), rot)
+                | x when x = kb.down    -> HandleKeys xs (kb, (newSpeed -incS -maxS speed), rot)
+                | x when x = kb.left    -> HandleKeys xs (kb, speed, (newRot rot 1.f))
+                | x when x = kb.right   -> HandleKeys xs (kb, speed, (newRot rot -1.f))
+                | _ -> HandleKeys xs (kb, speed, rot)
 
     match actor.Type with
-    | Player(pn,init_vel,rot) ->
+    | Player(pn,speed,rot) ->
         let kb = match pn with
                     | 1 -> {up = Keys.Up;   down = Keys.Down;   left = Keys.Left;   right = Keys.Right;}
                     | 2 -> {up = Keys.W;    down = Keys.S;      left = Keys.A;      right = Keys.D;}
                     | _ -> failwith "No keybinding for this player"
-        let velocity = HandleKeys (kbs.GetPressedKeys() |> Array.toList) (kb, init_vel)
-        //printfn "Player: %i vel: %f %f" pn velocity.X velocity.Y
+        let newSpeed, newRotation = HandleKeys (kbs.GetPressedKeys() |> Array.toList) (kb, speed, rot)
+        //printfn "Player: %i vel: %f %f %f" pn newSpeed newRotation.X newRotation.Y
         { 
             actor with 
-                Type = Player(pn,velocity,rot) 
+                Type = Player(pn, newSpeed, newRotation) 
         }
     | _ -> actor
 
