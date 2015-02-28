@@ -26,7 +26,7 @@ type Cargame () as x =
 
     let mutable WorldObjects = lazy (
         [
-            (1,"car.png", Player(1,Vector2(0.f,0.f), Vector2(0.f,0.f)), Vector2(32.f,32.f), Circle(16.f));
+            (1,"car.png", Player(1, 0.f, Vector2(1.f,0.f)), Vector2(32.f,32.f), Circle(16.f));
         ] |> List.map CreateActor'
     )
 
