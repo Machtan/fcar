@@ -5,32 +5,36 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Input
 open TestPlatformerActor
 
-let HandleInput (kbState:KeyboardState) actor =
-    let rec HandleKeys keys (currentVelocity:Vector2,state) =
+let maxvx = 1.0f // Max x velocity
+let xinc = 0.1f // x velocity increment
+let gravity = 4.0f // How fast you fall
+
+let HandleInput (kbs:KeyboardState) actor =
+    let rec HandleKeys keys (vel:Vector2, state) =
         match keys with
-        | [] -> currentVelocity
-        | x :: xs -> match x with
-                     | Keys.Left -> let newSpeed = 
-                                        if (currentVelocity.X - 0.1f) < -1.f 
-                                            then -1.f
-                                            else currentVelocity.X - 0.1f
-                                    let newV = Vector2(newSpeed, currentVelocity.Y)
-                                    HandleKeys xs (newV,state)
-                     | Keys.Right -> let newSpeed = 
-                                        if (currentVelocity.X + 0.1f) > 1.f 
-                                            then 1.f
-                                            else currentVelocity.X + 0.1f
-                                     let newV = Vector2(newSpeed, currentVelocity.Y)
-                                     HandleKeys xs (newV,state)
-                     | Keys.Space -> match state with
-                                     | Nothing -> let newV = Vector2(currentVelocity.X, currentVelocity.Y - 4.f)
-                                                  HandleKeys xs (newV, Jumping)
-                                     | Jumping -> HandleKeys xs (currentVelocity,state)
-                     | _ -> HandleKeys xs (currentVelocity,state)
+        | [] -> vel
+        | x :: xs -> 
+            match x with
+            | Keys.Left | Keys.Right -> 
+                let new_vx = 
+                    let dx = if x = Keys.Right then xinc else -xinc
+                    let max = if x = Keys.Right then maxvx else -maxvx
+                    if (vel.X + dx) < max
+                    then max
+                    else vel.X + dx
+                HandleKeys xs (Vector2(new_vx, vel.Y), state)
+            | Keys.Space -> 
+                match state with
+                | Nothing -> 
+                    HandleKeys xs (Vector2(vel.X, vel.Y - gravity), Jumping)
+                | Jumping -> HandleKeys xs (vel, state)
+            | _ -> HandleKeys xs (vel, state)
     match actor.ActorType with
-    | Player(s) -> let initialVelocity = match actor.BodyType with
-                                         | Dynamic(v)   -> v
-                                         | _            -> Vector2()
-                   let velocity = HandleKeys (kbState.GetPressedKeys() |> Array.toList) (initialVelocity, s)
-                   { actor with BodyType = Dynamic(velocity); ActorType = Player(Jumping) }
-    | _         -> actor
+    | Player(s) -> 
+        let init_vel = 
+            match actor.BodyType with
+            | Dynamic(v)   -> v
+            | _            -> Vector2()
+        let velocity = HandleKeys (kbs.GetPressedKeys() |> Array.toList) (init_vel, s)
+        { actor with BodyType = Dynamic(velocity); ActorType = Player(Jumping) }
+    | _ -> actor
