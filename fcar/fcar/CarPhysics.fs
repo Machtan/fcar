@@ -70,3 +70,13 @@ let Move objects =
             (move_objs rem (a::finished))
 
     move_objs dyn stc
+
+let AddFriction actor = 
+    match actor.Type with
+    | Player(id, v, rot) -> 
+        let newV = Vector2(v.X*0.95f, v.Y)
+        { actor with Type = Player(id, newV, rot) }
+    | Active(v, rot) ->
+        let newV = Vector2(v.X*0.95f, v.Y)
+        { actor with Type = Active(newV, rot) }
+    | _ -> actor

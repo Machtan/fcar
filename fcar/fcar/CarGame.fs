@@ -5,6 +5,7 @@ open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
 open CarActor
 open CarInput
+open CarPhysics
 
 type Cargame () as x =
     inherit Game()
@@ -44,7 +45,9 @@ type Cargame () as x =
         let current = WorldObjects.Value
         do WorldObjects <- lazy (
             current
-            |> List.map HandleInput')
+            |> List.map HandleInput'
+            |> List.map AddFriction
+            |> Move)
         do WorldObjects.Force () |> ignore
         ()
  
