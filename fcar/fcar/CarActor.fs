@@ -4,6 +4,10 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Content
 
+type CarType =
+    | Normal
+    | Speedi 
+
 type ActorType =
     | Player of int * float32 * Vector2
     | Active of Vector2 * Vector2
