@@ -21,7 +21,7 @@ let handle_collision col =
         | Player(n, vel, dir) ->
             match col.target.Type with
             | _ ->
-                Player(n, -vel, dir) // Bounce
+                Player(n, -(vel/2.f), dir) // Bounce
             (*| other -> // Stop
                 let nv = vel * HIT_FRICTION
                 Player(n, (if nv < VEL_TRESHOLD then 0.f else nv), dir)*)
@@ -40,7 +40,7 @@ let get_collision actor check =
                 match bodies with
                 | (Circle(ar), Circle(cr)) ->
                     let dr = ar + cr
-                    let d = check.Pos - (actor.Pos + vel)
+                    let d = check.Pos - actor.Pos
                     let dist = d.Length()
                     let diff = dist - dr
                     if diff < 0.0f
@@ -102,7 +102,7 @@ let Move objects =
 let AddFriction actor =
     match actor.Type with
     | Player(id, v, dir) ->
-        { actor with Type = Player(id, 
+        { actor with Type = Player(id,
                                     if v > 0.f
                                     then System.Math.Max(v - FRICTION, 0.f)
                                     else System.Math.Min(v + FRICTION, 0.f)

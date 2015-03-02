@@ -26,12 +26,12 @@ type Cargame () as x =
 
     let mutable WorldObjects = lazy (
         [
-            (1,"car.png", Player(1, 0.f, Vector2(1.f,0.f)), Vector2(32.f,32.f), Circle(16.f));
+            (1,"car.png", Player(1, 0.f, Vector2(1.f,0.f)), Vector2(32.f,32.f), Circle(12.f));
             (2, "obstacle.png", Obstacle, Vector2(128.f, 128.f), Circle(16.f));
             (3, "obstacle.png", Obstacle, Vector2(128.f, 160.f), Circle(16.f));
             (4, "obstacle.png", Obstacle, Vector2(256.f, 128.f), Circle(16.f));
             (5, "obstacle.png", Obstacle, Vector2(256.f, 256.f), Circle(16.f));
-            (6, "car.png", Player(2, 0.f, Vector2(1.f,0.f)), Vector2(32.f,128.f), Circle(16.f));
+            (6, "car.png", Player(2, 0.f, Vector2(1.f,0.f)), Vector2(32.f,128.f), Circle(12.f));
             (7, "logo.png", Decoration, Vector2(200.f, 200.f), Empty);
             (8, "car.png", Decoration, Vector2(200.f, 250.f), Empty);
         ] |> List.map CreateActor'
@@ -40,8 +40,8 @@ type Cargame () as x =
     let DrawActor (sb:SpriteBatch) actor =
         if actor.Texture.IsSome then
             let origin =
-                match actor.Geom with
-                | Circle(r) -> Vector2(r, r)
+                match actor.Texture with
+                | Some(tex) -> Vector2((float32 tex.Width) / 2.f, (float32 tex.Height) / 2.f)
                 | _ -> Vector2.Zero
             let angle =
                 match actor.Type with
