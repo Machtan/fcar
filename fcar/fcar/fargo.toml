@@ -1,23 +1,22 @@
 name = "FCar"
-main = "Program.fs"
+main = "Program"
 assets = "assets"
 developer = "com.machtan"
 version = "1.0.0"
 icon = "icon.icns"
 authors = ["Jakob Lautrup Nysom", "Stinus Møhl Thomsen"]
-
-dependencies = [
+libraries = [
     "MonoMac",
     "Lidgren.Network",
     "Tao.Sdl",
-    "MonoGame.Framework"
+    "MonoGame.Framework",
 ]
 
 # The order of these is important!
 # (Maybe I'll add a dependency graph at some point)
-modules = [
-    "CarActor",
-    "CarInput",
-    "CarPhysics",
-    "CarGame",
-]
+[targets] # Manual dependency resolution (atm)
+Program = ["MonoMac", "CarGame"]
+CarActor = ["MonoGame.Framework"]
+CarInput = ["MonoGame.Framework", "CarActor"]
+CarPhysics = ["MonoGame.Framework", "CarActor"]
+CarGame = ["MonoGame.Framework", "CarActor", "CarInput", "CarPhysics"]
