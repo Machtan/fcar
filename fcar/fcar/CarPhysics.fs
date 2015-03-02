@@ -19,8 +19,12 @@ let handle_collision col =
     let a =
         match col.actor.Type with
         | Player(n, vel, dir) ->
-            let nv = vel * HIT_FRICTION
-            Player(n, (if nv < VEL_TRESHOLD then 0.f else nv), dir)
+            match col.target.Type with
+            | _ ->
+                Player(n, -vel, dir) // Bounce
+            (*| other -> // Stop
+                let nv = vel * HIT_FRICTION
+                Player(n, (if nv < VEL_TRESHOLD then 0.f else nv), dir)*)
         | other -> other
     ({ col.actor with Type = a; }, col.mov, col.target)
 
