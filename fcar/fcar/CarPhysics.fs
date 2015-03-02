@@ -100,7 +100,7 @@ let AddFriction actor =
     | Player(id, v, dir) ->
         { actor with Type = Player(id, 
                                     if v > 0.f
-                                    then System.Math.Min(v - FRICTION, 0.f)
-                                    else System.Math.Max(v + FRICTION, 0.f)
+                                    then System.Math.Max(v - FRICTION, 0.f)
+                                    else System.Math.Min(v + FRICTION, 0.f)
                                 , dir) }
     | _ -> actor

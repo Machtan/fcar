@@ -142,3 +142,4 @@ App_Data/*.ldf
 *.sln
 *.config
 *.fsproj
+*.ggb

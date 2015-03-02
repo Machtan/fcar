@@ -48,9 +48,9 @@ let HandleInput (kbs:KeyboardState) actor =
                     | 2 -> {up = Keys.W;    down = Keys.S;      left = Keys.A;      right = Keys.D;}
                     | _ -> failwith "No keybinding for this player"
         let newSpeed, newRotation = HandleKeys (kbs.GetPressedKeys() |> Array.toList) (kb, speed, rot)
-        if pn = 1 then
+        //if pn = 1 then
             //printfn "Player: %i vel: %f %f %f" pn newSpeed newRotation.X newRotation.Y
-            printfn "0.1: %f 0.5: %f 1.0: %f 4.0: %f 8.0: %f" (dirMod -0.1) (dirMod -0.5) (dirMod -1.0) (dirMod -4.0) (dirMod -8.0)
+            //printfn "0.1: %f 0.5: %f 1.0: %f 4.0: %f 8.0: %f" (dirMod -0.1) (dirMod -0.5) (dirMod -1.0) (dirMod -4.0) (dirMod -8.0)
         { 
             actor with 
                 Type = Player(pn, newSpeed, newRotation) 
