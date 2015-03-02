@@ -22,7 +22,7 @@ let handle_collision col =
             let nv = vel * HIT_FRICTION
             Player(n, (if nv < VEL_TRESHOLD then 0.f else nv), dir)
         | other -> other
-    (a, col.mov, col.target)
+    ({ col.actor with Type = a; }, col.mov, col.target)
 
 let get_collision actor check =
     match actor.Type with
@@ -42,7 +42,7 @@ let get_collision actor check =
                     if diff < 0.0f
                     then
                         Some ({ actor = actor;
-                        mov = vel + ((Vector2.Normalize vel) * diff);
+                        mov = Vector2(0.f,0.f);//vel + ((Vector2.Normalize vel) * diff);
                         dist = System.Math.Abs diff;
                         target = check;
                         })
@@ -75,21 +75,23 @@ let Move objects =
         match remaining with
         | [] -> finished
         | actor::rem ->
-            let a =
-                match checkcols actor finished None with
-                | Some(col) ->
-                    let (na, nm, nt) = handle_collision col
-                    (*match actor.Type with
-                    | Player(num, _, _) ->
-                        printfn "Moving player %i by (%f, %f)" num col.mov.X col.mov.Y
-                    | _ -> ()*)
-                    { actor with Pos = actor.Pos + col.mov; }
-                | None ->
+            let moved_actor =
+                // Create the movement target
+                let target =
                     match actor.Type with
                     | Player(_, vel, dir) ->
                         { actor with Pos = actor.Pos + dir * vel; }
                     | _ -> failwith "Attempting to move obstacle or Active :i"
-            (move_objs rem (a::finished))
+
+                // Check if the target collides with anything
+                match checkcols target finished (checkcols target rem None) with
+                | Some(col) ->
+                    // Get the handled collision parameters
+                    let (new_actor, new_movement, new_target) = handle_collision col
+                    { new_actor with Pos = actor.Pos + new_movement; }
+                    //actor
+                | None -> target
+            (move_objs rem (moved_actor::finished))
 
     dec @ (move_objs dyn stc)
 
