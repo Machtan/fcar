@@ -3,7 +3,7 @@ module CarPhysics
 open Microsoft.Xna.Framework
 open CarActor
 
-let FRICTION = 0.95f
+let FRICTION = 0.03f
 let HIT_FRICTION = 0.5f
 let VEL_TRESHOLD = 0.001f
 
@@ -102,5 +102,9 @@ let Move objects =
 let AddFriction actor =
     match actor.Type with
     | Player(id, v, dir) ->
-        { actor with Type = Player(id, v * FRICTION, dir) }
+        { actor with Type = Player(id, 
+                                    if v > 0.f
+                                    then System.Math.Max(v - FRICTION, 0.f)
+                                    else System.Math.Min(v + FRICTION, 0.f)
+                                , dir) }
     | _ -> actor
